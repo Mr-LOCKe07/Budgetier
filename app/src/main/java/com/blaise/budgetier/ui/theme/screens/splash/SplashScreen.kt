@@ -2,6 +2,7 @@ package com.blaise.budgetier.ui.theme.screens.splash
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,7 +30,9 @@ fun Splash_Screen(navController: NavHostController) {
         Image(
             painter = painterResource(id = R.drawable.splashscreen),
             contentDescription = "Budgetier Splash Screen",
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .fillMaxHeight(1f)
         )
     }
 }
