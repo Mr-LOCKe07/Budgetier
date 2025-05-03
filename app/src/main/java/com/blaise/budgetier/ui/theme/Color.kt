@@ -2,6 +2,7 @@ package com.blaise.budgetier.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
+val NewOrange = Color(0xFFFF9800)
 val MoneyGreen = Color(0xFF307C28)
 val YellowElegance = Color(0xB5FFCA00)
 val Purple80 = Color(0xFFD0BCFF)

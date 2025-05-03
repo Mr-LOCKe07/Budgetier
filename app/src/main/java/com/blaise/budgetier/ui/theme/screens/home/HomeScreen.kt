@@ -47,7 +47,7 @@ fun Home_Screen(navController: NavHostController) {
             fontFamily = FontFamily.Cursive
         )
 
-        Text(text = "BUDGETIER,",
+        Text(text = "BUDGETIER",
             fontSize = 40.sp,
             color = YellowElegance,
             fontFamily = FontFamily.Serif,
@@ -55,15 +55,9 @@ fun Home_Screen(navController: NavHostController) {
         )
 
         Image(
-            painter = painterResource(id = R.drawable.logo),
+            painter = painterResource(id = R.drawable.motto),
             contentDescription = "Budgetier Logo",
             modifier = Modifier.size(300.dp)
-        )
-
-        Text(text = "An app that lets you master your money to shape your future.",
-        fontSize = 20.sp,
-        color = Color.Black,
-        fontFamily = FontFamily.Serif
         )
 
         Spacer(modifier = Modifier.height(20.dp))

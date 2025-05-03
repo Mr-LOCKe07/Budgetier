@@ -1,12 +1,16 @@
 package com.blaise.budgetier.ui.theme.screens.register
 
+import android.content.Context
+import android.provider.Settings.Global.putString
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
@@ -30,7 +34,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
@@ -40,16 +46,21 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.blaise.budgetier.navigation.ROUTE_HOME
+import com.blaise.budgetier.navigation.ROUTE_LOGIN
 import com.blaise.budgetier.navigation.ROUTE_REGISTER
 import com.blaise.budgetier.ui.theme.MoneyGreen
+import com.blaise.budgetier.ui.theme.NewOrange
 import com.blaise.budgetier.ui.theme.YellowElegance
 
 @Composable
 fun Register_Screen(navController: NavHostController) {
+    val context = LocalContext.current
+
     var fullname by remember { mutableStateOf(TextFieldValue("")) }
     var phonenumber by remember { mutableStateOf(TextFieldValue("")) }
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
+    var confirmpassword by remember { mutableStateOf(TextFieldValue("")) }
 
     Column (
         verticalArrangement = Arrangement.Top,
@@ -73,20 +84,23 @@ fun Register_Screen(navController: NavHostController) {
             leadingIcon = {
                 Icon(
                     Icons.Default.Person,
-                    contentDescription = "Person Icon"
+                    contentDescription = "Person Icon",
+                    tint = YellowElegance
                 )
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             label = {
                 Text(
-                    text = "Fill in your full name",
+                    text = "Full name",
                     color = Color.White,
                     fontSize = 20.sp,
                     fontFamily = FontFamily.Serif
                 )
             },
             shape = RoundedCornerShape(20.dp),
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -96,20 +110,23 @@ fun Register_Screen(navController: NavHostController) {
             leadingIcon = {
                 Icon(
                     Icons.Default.Call,
-                    contentDescription = "Call Icon"
+                    contentDescription = "Call Icon",
+                    tint = YellowElegance
                 )
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             label = {
                 Text(
-                    text = "Fill in your phone number",
+                    text = "Phone number",
                     color = Color.White,
                     fontSize = 20.sp,
                     fontFamily = FontFamily.Serif
                 )
             },
             shape = RoundedCornerShape(20.dp),
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -119,20 +136,23 @@ fun Register_Screen(navController: NavHostController) {
             leadingIcon = {
                 Icon(
                     Icons.Default.Email,
-                    contentDescription = "Email Icon"
+                    contentDescription = "Email Icon",
+                    tint = YellowElegance
                 )
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             label = {
                 Text(
-                    text = "Fill in your email",
+                    text = "Email",
                     color = Color.White,
                     fontSize = 20.sp,
                     fontFamily = FontFamily.Serif
                 )
             },
             shape = RoundedCornerShape(20.dp),
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         )
 
         Spacer(modifier = Modifier.height(20.dp))
@@ -142,24 +162,62 @@ fun Register_Screen(navController: NavHostController) {
             leadingIcon = {
                 Icon(
                     Icons.Default.Lock,
-                    contentDescription = "Lock Icon"
+                    contentDescription = "Lock Icon",
+                    tint = YellowElegance
                 )
             },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             label = {
                 Text(
-                    text = "Fill in a password",
+                    text = "Password",
                     color = Color.White,
                     fontSize = 20.sp,
                     fontFamily = FontFamily.Serif
                 )
             },
             shape = RoundedCornerShape(20.dp),
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
+
+        Spacer(modifier = Modifier.height(20.dp))
+        OutlinedTextField(
+            value = confirmpassword,
+            onValueChange = { confirmpassword = it },
+            leadingIcon = {
+                Icon(
+                    Icons.Default.Lock,
+                    contentDescription = "Lock Icon",
+                    tint = YellowElegance
+                )
+            },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            label = {
+                Text(
+                    text = "Confirm Password",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Serif
+                )
+            },
+            shape = RoundedCornerShape(20.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         )
 
         Spacer(modifier = Modifier.height(10.dp))
-        Button(onClick = {navController.navigate(ROUTE_HOME)},
+        Button(onClick = {
+                         val sharedPref = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
+                         sharedPref.edit().apply{
+                             putString("full_name", fullname.text)
+                             putString("phone", phonenumber.text)
+                             putString("email", email.text)
+                             apply()
+                         }
+                             navController.navigate(ROUTE_HOME)
+                         },
             colors = ButtonDefaults.buttonColors(Color.Transparent),
             border = BorderStroke(2.dp, YellowElegance),
             shape = RoundedCornerShape(20.dp),
@@ -172,16 +230,28 @@ fun Register_Screen(navController: NavHostController) {
         }
 
         Spacer(modifier = Modifier.height(10.dp))
-        Text(text = "Already have an account?",
-            color = Color.Red,
-            fontSize = 20.sp,
-            fontFamily = FontFamily.Serif)
 
-        Text(text = "Click here to Login",
-            modifier = Modifier.clickable { ROUTE_REGISTER },
-            color = Color.White,
-            fontSize = 30.sp,
-            fontFamily = FontFamily.Cursive)
+        Row() {
+            Text(
+                text = "Already have an account?",
+                color = NewOrange,
+                fontSize = 25.sp,
+                fontFamily = FontFamily.Serif
+            )
+
+            Spacer(modifier = Modifier.width(10.dp))
+            Column () {
+                Text(
+                    text = "Login",
+                    modifier = Modifier.clickable { navController.navigate(ROUTE_LOGIN) },
+                    color = Color.White,
+                    fontSize = 25.sp,
+                    fontFamily = FontFamily.SansSerif,
+                    fontWeight = FontWeight.Bold,
+                    fontStyle = FontStyle.Italic
+                )
+            }
+        }
     }
 }
 

@@ -16,15 +16,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.blaise.budgetier.R
 import com.blaise.budgetier.ui.theme.MoneyGreen
+import com.blaise.budgetier.ui.theme.YellowElegance
 
 @Composable
-private fun Intermediate_Screen(navController: NavHostController) {
+fun Menu_Screen(navController: NavHostController) {
     Column (modifier = Modifier.fillMaxSize()){
         DrawerHeader()
     }
@@ -46,15 +50,16 @@ private fun DrawerHeader(modifier: Modifier = Modifier) {
             contentDescription = stringResource(id = R.string.app_name),
             modifier = Modifier.width(100.dp)
         )
-        Text(
-            text = "Budgetier",
-            color = MaterialTheme.colorScheme.surface
+        Text(text = "BUDGETIER",
+            color = YellowElegance,
+            fontFamily = FontFamily.Serif,
+            fontWeight = FontWeight.Bold
         )
     }
 }
 
 @Preview
 @Composable
-private fun IntermediatePreview() {
-    Intermediate_Screen(rememberNavController())
+private fun MenuPreview() {
+    Menu_Screen(rememberNavController())
 }
