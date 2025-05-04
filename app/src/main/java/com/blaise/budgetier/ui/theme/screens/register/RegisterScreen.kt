@@ -1,7 +1,6 @@
 package com.blaise.budgetier.ui.theme.screens.register
 
 import android.content.Context
-import android.provider.Settings.Global.putString
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -47,7 +46,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.blaise.budgetier.navigation.ROUTE_HOME
 import com.blaise.budgetier.navigation.ROUTE_LOGIN
-import com.blaise.budgetier.navigation.ROUTE_REGISTER
 import com.blaise.budgetier.ui.theme.MoneyGreen
 import com.blaise.budgetier.ui.theme.NewOrange
 import com.blaise.budgetier.ui.theme.YellowElegance

@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.blaise.budgetier.ui.theme.screens.addition.AddCategoryDialog
 import com.blaise.budgetier.ui.theme.screens.home.Home_Screen
 import com.blaise.budgetier.ui.theme.screens.login.Login_Screen
 import com.blaise.budgetier.ui.theme.screens.main.Main_Screen

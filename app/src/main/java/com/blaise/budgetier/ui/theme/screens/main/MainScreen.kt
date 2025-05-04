@@ -20,17 +20,25 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,10 +52,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.blaise.budgetier.R
+import com.blaise.budgetier.data.Service
 import com.blaise.budgetier.navigation.BottomBar
 import com.blaise.budgetier.navigation.ROUTE_AUTOMOBILE
 import com.blaise.budgetier.navigation.ROUTE_MENU
 import com.blaise.budgetier.ui.theme.MoneyGreen
+import com.blaise.budgetier.ui.theme.NewOrange
 import com.blaise.budgetier.ui.theme.YellowElegance
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,193 +65,67 @@ import com.blaise.budgetier.ui.theme.YellowElegance
 fun Main_Screen(navController: NavHostController) {
     Scaffold (
         bottomBar = { BottomBar(navController) }
-    ){ innerPadding ->
-        Column (
+    ) { innerPadding ->
+        Column(
             modifier = Modifier
                 .padding(innerPadding)
                 .verticalScroll(rememberScrollState())
                 .background(MoneyGreen)
-        ){
+        ) {
             val context = LocalContext.current
             val sharedPref = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
 
             val name = sharedPref.getString("full_name", "User")
             val email = sharedPref.getString("email", "No email")
 
-            Column(
-                modifier = Modifier
-                    .background(MoneyGreen)
-                    .verticalScroll(rememberScrollState())
-            ) {
-                Box {
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp),
-                        shape = RoundedCornerShape(bottomStart = 20.dp, bottomEnd = 20.dp),
-                        colors = CardDefaults.cardColors(YellowElegance)
+            val services = remember { mutableStateListOf<Service>() }
+            var showAddDialog by remember { mutableStateOf(false) }
+
+            Scaffold(
+                floatingActionButton = {
+                    FloatingActionButton(
+                        onClick = { showAddDialog = true },
+                        containerColor = NewOrange
                     ) {
-                        TopAppBar(
-                            title = { Text(text = "Welcome") },
-                            navigationIcon = {
-                                IconButton(onClick = { navController.navigate(ROUTE_MENU) }) {
-                                    Icon(
-                                        imageVector = Icons.Default.Menu,
-                                        contentDescription = "Taskbar"
-                                    )
+                        Icon(Icons.Default.Add, contentDescription = "Add Service")
+                    }
+                }
+            ) { paddingValues ->
+                Column(
+                    modifier = Modifier
+                        .padding(paddingValues)
+                        .fillMaxSize()
+                        .padding(16.dp)
+                ) {
+                    val totalBudget = services.sumOf { it.budget }
+                    Text("Total Budget: KES $totalBudget", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+
+                    Spacer(Modifier.height(16.dp))
+
+                    services.forEach { index, service ->
+                        Card (
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            shape = RoundedCornerShape(16.dp)
+                        ){
+                            Row (
+                                modifier = Modifier.padding(16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ){
+                                Icon(service.icon, contentDescription = null)
+                                Text(service.name, fontWeight = FontWeight.Bold)
+                                Text("KES ${service.budget}")
+                                IconButton(onClick = { service.removeAt(index) }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
                                 }
                             }
-                        )
-                        Row(
-                            modifier = Modifier
-                                .padding(start = 16.dp, top = 20.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                Icons.Default.Person,
-                                contentDescription = "Person Icon",
-                                modifier = Modifier
-                                    .size(50.dp)
-                                    .background(Color.White, CircleShape)
-                                    .padding(8.dp)
-                            )
-
-                            Spacer(modifier= Modifier.width(12.dp))
-
-                            Column {
-                                Text(
-                                    text = "Hello $name",
-                                    color = Color.White,
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize = 50.sp
-                                )
-                                Text(
-                                    text = "$email",
-                                    color = Color.White,
-                                    fontSize = 14.sp
-                                )
-                            }
                         }
                     }
 
-                }
-
-                Box (
-                    modifier = Modifier
-                        .fillMaxWidth(),
-                    contentAlignment = Alignment.Center
-                ){
-                    Text(
-                        text = "BUDGET SERVICES",
-                        fontSize = 50.sp,
-                        fontFamily = FontFamily.Serif,
-                        color = YellowElegance
-                    )
-                }
-
-                Row(modifier = Modifier.padding(20.dp)) {
-                    Card(
-                        modifier = Modifier
-                            .width(150.dp)
-                            .height(180.dp)
-                            .clickable { /*TODO*/ },
-                        elevation = CardDefaults.cardElevation()
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.icons8_food_receiver_24),
-                                contentDescription = "Food Receiver icon by Icons8",
-                                modifier = Modifier.size(100.dp)
-                            )
-                            Text(
-                                text = "Groceries",
-                                fontSize = 15.sp
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.width(50.dp))
-
-                    Card(
-                        modifier = Modifier
-                            .width(150.dp)
-                            .height(180.dp)
-                            .clickable { navController.navigate(ROUTE_AUTOMOBILE) },
-                        elevation = CardDefaults.cardElevation()
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.icons8_car_24),
-                                contentDescription = "Car icon by Icons8",
-                                modifier = Modifier.size(100.dp)
-                            )
-                            Text(
-                                text = "Automobile",
-                                fontSize = 15.sp
-                            )
-                        }
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(10.dp))
-
-                Row(modifier = Modifier.padding(20.dp)) {
-                    Card(
-                        modifier = Modifier
-                            .width(150.dp)
-                            .height(180.dp)
-                            .clickable { /*TODO*/ },
-                        elevation = CardDefaults.cardElevation()
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.icons8_house_24),
-                                contentDescription = "House icon by Icons8",
-                                modifier = Modifier.size(100.dp)
-                            )
-                            Text(
-                                text = "Residence",
-                                fontSize = 15.sp
-                            )
-                        }
-                    }
-
-                    Spacer(modifier = Modifier.width(50.dp))
-
-                    Card(
-                        modifier = Modifier
-                            .width(150.dp)
-                            .height(180.dp)
-                            .clickable { /*TODO*/ },
-                        elevation = CardDefaults.cardElevation()
-                    ) {
-                        Column(
-                            modifier = Modifier.fillMaxSize(),
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            verticalArrangement = Arrangement.Center
-                        ) {
-                            Image(
-                                painter = painterResource(id = R.drawable.icons8_subscription_24),
-                                contentDescription = "Subscription icon by Icons8",
-                                modifier = Modifier.size(100.dp)
-                            )
-                            Text(
-                                text = "Subscriptions",
-                                fontSize = 15.sp
-                            )
-                        }
+                    if (showAddDialog) {
+                        AddS
                     }
                 }
             }

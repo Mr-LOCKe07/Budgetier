@@ -2,7 +2,7 @@ package com.blaise.budgetier.ui.theme.screens.budget_services
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,17 +16,20 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,6 +49,7 @@ import com.blaise.budgetier.navigation.BottomBar
 import com.blaise.budgetier.ui.theme.MoneyGreen
 import com.blaise.budgetier.ui.theme.NewOrange
 import com.blaise.budgetier.ui.theme.YellowElegance
+import com.blaise.budgetier.ui.theme.screens.addition.AddCategoryDialog
 
 @Composable
 fun Automobile_Screen(navController: NavHostController) {
@@ -64,18 +68,32 @@ fun Automobile_Screen(navController: NavHostController) {
     val totalSpent = fuel + servicing + insurance
     val budget = budgetLimit.toDoubleOrNull() ?: 0.0
 
+    var showDialog by remember { mutableStateOf(false) }
+    val categoryList = remember { mutableStateListOf<Pair<String, String>>() }
+
     Scaffold (
         bottomBar = { BottomBar(navController) },
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /*TODO*/ },
+                onClick = { showDialog = true },
                 containerColor = NewOrange
             ) {
                 Icon(Icons.Default.Add, contentDescription = "Add")
                 Spacer(modifier = Modifier.width(8.dp))
             }
         }
-    ){ innerPadding ->
+    ) { innerPadding ->
+
+        if (showDialog) {
+            AddCategoryDialog(
+                onDismiss = { showDialog = true },
+                onAddCategory = { category, budget ->
+                    categoryList.add(category to budget)
+                    showDialog = false
+                }
+            )
+        }
+
         Column (
             modifier = Modifier
                 .background(YellowElegance)
@@ -159,6 +177,24 @@ fun Automobile_Screen(navController: NavHostController) {
 
             Spacer(modifier = Modifier.height(24.dp))
             Text("Track Automobile Spending", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Custom Categories", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+
+            categoryList.forEachIndexed { index, (category, budget) ->
+                Row (
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 4.dp)
+                ){
+                    Text("$category - KES $budget")
+                    IconButton(onClick = { categoryList.removeAt(index) }) {
+                        Icon(Icons.Default.Delete, contentDescription = "Delete")
+                    }
+                }
+            }
 
             Spacer(modifier = Modifier.height(12.dp))
 
