@@ -7,11 +7,9 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.blaise.budgetier.navigation.AppNavHost
+import com.blaise.budgetier.model.SharedServiceViewModel
+import com.blaise.budgetier.navigation.NavGraph
 import com.blaise.budgetier.ui.theme.BudgetierTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,7 +19,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             BudgetierTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    AppNavHost()
+                    NavGraph(viewModel = SharedServiceViewModel(),
+                        modifier = Modifier.padding(innerPadding))
                 }
             }
         }

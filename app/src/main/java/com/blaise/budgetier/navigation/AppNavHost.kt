@@ -6,54 +6,48 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.blaise.budgetier.ui.theme.screens.addition.AddCategoryDialog
+import com.blaise.budgetier.model.SharedServiceViewModel
 import com.blaise.budgetier.ui.theme.screens.home.Home_Screen
 import com.blaise.budgetier.ui.theme.screens.login.Login_Screen
 import com.blaise.budgetier.ui.theme.screens.main.Main_Screen
 import com.blaise.budgetier.ui.theme.screens.menu.Menu_Screen
 import com.blaise.budgetier.ui.theme.screens.register.Register_Screen
-import com.blaise.budgetier.ui.theme.screens.budget_services.Automobile_Screen
-import com.blaise.budgetier.ui.theme.screens.budget_services.Groceries_Screen
-import com.blaise.budgetier.ui.theme.screens.budget_services.Residence_Screen
-import com.blaise.budgetier.ui.theme.screens.budget_services.Subscriptions_Screen
+import com.blaise.budgetier.ui.theme.screens.services.Service_Screen
 import com.blaise.budgetier.ui.theme.screens.splash.Splash_Screen
 
 @Composable
-fun AppNavHost(modifier: Modifier = Modifier,
-               navController: NavHostController = rememberNavController(),
-               startDestination:String = ROUTE_SPLASH) {
-    NavHost(modifier = Modifier,
-        navController = navController,
-        startDestination = startDestination){
+fun NavGraph(
+    viewModel: SharedServiceViewModel,
+    navController: NavHostController = rememberNavController(),
+    startDestination: String = ROUTE_SPLASH,
+    modifier: Modifier
+) {
+    val navController = rememberNavController()
+
+    NavHost(navController = navController,
+        startDestination = "splash") {
+        composable ("main"){
+            Main_Screen(navController = navController, viewModel = viewModel)
+        }
         composable(ROUTE_SPLASH) {
             Splash_Screen(navController)
         }
         composable(ROUTE_HOME){
             Home_Screen(navController)
         }
-        composable(ROUTE_MAIN){
-            Main_Screen(navController)
-        }
         composable (ROUTE_MENU){
             Menu_Screen(navController)
         }
-        composable (ROUTE_RESIDENCE){
-            Residence_Screen(navController)
-        }
-        composable (ROUTE_AUTOMOBILE){
-            Automobile_Screen(navController)
-        }
-        composable (ROUTE_GROCERIES){
-            Groceries_Screen(navController)
-        }
-        composable (ROUTE_SUBSCRIPTIONS){
-            Subscriptions_Screen(navController)
-        }
         composable(ROUTE_LOGIN){
-           Login_Screen(navController)
+            Login_Screen(navController)
         }
         composable(ROUTE_REGISTER){
             Register_Screen(navController)
+        }
+        viewModel.services.forEach { service ->
+            composable(service.route) {
+                Service_Screen(route = service.route, viewModel = viewModel)
+            }
         }
     }
 }

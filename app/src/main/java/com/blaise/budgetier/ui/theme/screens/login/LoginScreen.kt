@@ -119,7 +119,7 @@ fun Login_Screen(navController: NavHostController) {
         )
 
         Spacer(modifier = Modifier.height(10.dp))
-        Button(onClick = {navController.navigate(ROUTE_MAIN)},
+        Button(onClick = { navController.navigate(ROUTE_MAIN) },
             colors = ButtonDefaults.buttonColors(Color.Transparent),
             border = BorderStroke(2.dp, YellowElegance),
             shape = RoundedCornerShape(20.dp),
