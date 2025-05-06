@@ -4,6 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
@@ -30,16 +31,17 @@ fun AddCategoryDialog(
     val categoryOptions = listOf("Fuel", "Insurance", "Servicing", "Repairs", "Groceries", "Rent", "Electricity Bill", "Water Bill")
     var selectedCategory by remember { mutableStateOf(categoryOptions.first()) }
     var budgetInput by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    val isFormValid = selectedCategory.isNotBlank() && budgetInput.isNotBlank()
 
     AlertDialog(
-        onDismissRequest = { onDismiss() },
+        onDismissRequest =  onDismiss,
         confirmButton = {
             TextButton (onClick = {
-                if (budgetInput.isNotEmpty()) {
-                    onAddCategory(selectedCategory, budgetInput)
-                    onDismiss()
-                }
-            }
+               onAddCategory(selectedCategory, budgetInput)
+                onDismiss()
+            },
+                enabled = isFormValid
             ) {
                 Text("Add")
             }
@@ -52,11 +54,15 @@ fun AddCategoryDialog(
         title = { Text("Add Budget Category") },
         text = {
             Column {
-                var expanded by remember { mutableStateOf(false) }
                 Box {
-                    Text(selectedCategory, modifier = Modifier
-                        .clickable { expanded = true}
-                        .padding(8.dp)
+                    OutlinedTextField(
+                        value = selectedCategory,
+                        onValueChange = {},
+                        label = { Text("Select Category") },
+                        readOnly = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { expanded = true }
                     )
                     DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
                         categoryOptions.forEach { category ->
@@ -77,7 +83,8 @@ fun AddCategoryDialog(
                     value = budgetInput,
                     onValueChange = { budgetInput = it },
                     label = { Text("Enter limit") },
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number)
+                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Number),
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }

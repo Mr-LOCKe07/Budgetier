@@ -229,7 +229,7 @@ fun Register_Screen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(10.dp))
 
-        Row() {
+        Row{
             Text(
                 text = "Already have an account?",
                 color = NewOrange,
@@ -238,7 +238,7 @@ fun Register_Screen(navController: NavHostController) {
             )
 
             Spacer(modifier = Modifier.width(10.dp))
-            Column () {
+            Column {
                 Text(
                     text = "Login",
                     modifier = Modifier.clickable { navController.navigate(ROUTE_LOGIN) },
