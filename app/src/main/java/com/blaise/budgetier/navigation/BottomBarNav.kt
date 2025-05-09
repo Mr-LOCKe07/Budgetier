@@ -50,7 +50,7 @@ fun BudgetNavigationDrawer(navController: NavHostController) {
     val items = listOf(
         BottomNavItem("Main", Icons.Filled.ArrowCircleLeft, ROUTE_MAIN),
         BottomNavItem("Housing", Icons.Filled.Home, ROUTE_HOUSING),
-        BottomNavItem("Transportation", Icons.Filled.Commute, ROUTE_TRANSPORTATION),
+        BottomNavItem("Transport", Icons.Filled.Commute, ROUTE_TRANSPORTATION),
         BottomNavItem("Food", Icons.Filled.ShoppingCart, ROUTE_FOOD),
         BottomNavItem("Utilities", Icons.Filled.TipsAndUpdates, ROUTE_UTILITIES),
         BottomNavItem("Insurance", Icons.Filled.Money, ROUTE_INSURANCE),

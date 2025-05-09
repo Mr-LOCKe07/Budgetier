@@ -48,11 +48,14 @@ fun Transportation_Screen(navController: NavHostController) {
     var budgetLimit by remember { mutableStateOf("") }
     var savedLimit by remember { mutableStateOf("") }
 
+    var car_payment by remember { mutableStateOf("") }
     var fuel by remember { mutableStateOf("") }
-    var servicing by remember { mutableStateOf("") }
-    var insurance by remember { mutableStateOf("") }
+    var maintenance by remember { mutableStateOf("") }
+    var public_transit by remember { mutableStateOf("") }
+    var ride_sharing by remember { mutableStateOf("") }
+    var parking by remember { mutableStateOf("") }
 
-    val totalSpent = listOf(fuel, servicing, insurance)
+    val totalSpent = listOf(car_payment, fuel, maintenance, public_transit, ride_sharing, parking)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
 
@@ -67,7 +70,7 @@ fun Transportation_Screen(navController: NavHostController) {
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("Transport Budget",
+            Text("Transportation Budget",
                 fontWeight = FontWeight.Bold,
                 fontSize = 40.sp,
                 color = NewOrange)
@@ -127,7 +130,9 @@ fun Transportation_Screen(navController: NavHostController) {
                     onClick = {
                         savedLimit = budgetLimit
                         isEditing = false
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(Color.Transparent),
+                    border = BorderStroke(2.dp, MoneyGreen)
                 ) {
                     Text("Save Limit")
                 }
@@ -136,6 +141,21 @@ fun Transportation_Screen(navController: NavHostController) {
             }
 
             Spacer(modifier = Modifier.height(12.dp))
+
+            OutlinedTextField(
+                value = car_payment,
+                onValueChange = { car_payment = it },
+                label = { Text("Car Payment (KES)",
+                    color = NewOrange,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Serif) },
+                shape = RoundedCornerShape(16.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
 
             OutlinedTextField(
                 value = fuel,
@@ -152,9 +172,9 @@ fun Transportation_Screen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = servicing,
-                onValueChange = { servicing = it },
-                label = { Text("Servicing (KES)",
+                value = maintenance,
+                onValueChange = { maintenance = it },
+                label = { Text("Maintenance (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
                     fontFamily = FontFamily.Serif) },
@@ -166,9 +186,9 @@ fun Transportation_Screen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = insurance,
-                onValueChange = { insurance = it },
-                label = { Text("Insurance (KES)",
+                value = public_transit,
+                onValueChange = { public_transit = it },
+                label = { Text("Public Transit (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
                     fontFamily = FontFamily.Serif
@@ -177,6 +197,37 @@ fun Transportation_Screen(navController: NavHostController) {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = ride_sharing,
+                onValueChange = { ride_sharing = it },
+                label = { Text("Ride Sharing (KES)",
+                    color = NewOrange,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Serif
+                ) },
+                shape = RoundedCornerShape(16.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = parking,
+                onValueChange = { parking = it },
+                label = { Text("Parking (KES)",
+                    color = NewOrange,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Serif
+                ) },
+                shape = RoundedCornerShape(16.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
 
             Spacer(modifier = Modifier.height(16.dp))
 

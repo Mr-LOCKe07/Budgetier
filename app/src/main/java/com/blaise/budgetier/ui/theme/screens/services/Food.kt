@@ -49,8 +49,10 @@ fun Food_Screen(navController: NavHostController) {
     var savedLimit by remember { mutableStateOf("") }
 
     var groceries by remember { mutableStateOf("") }
+    var dining_out by remember { mutableStateOf("") }
+    var drinks by remember { mutableStateOf("") }
 
-    val totalSpent = listOf(groceries)
+    val totalSpent = listOf(groceries, dining_out, drinks)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
 
@@ -125,7 +127,9 @@ fun Food_Screen(navController: NavHostController) {
                     onClick = {
                         savedLimit = budgetLimit
                         isEditing = false
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(Color.Transparent),
+                    border = BorderStroke(2.dp, MoneyGreen)
                 ) {
                     Text("Save Limit")
                 }
@@ -146,6 +150,35 @@ fun Food_Screen(navController: NavHostController) {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = dining_out,
+                onValueChange = { dining_out = it },
+                label = { Text("Dining Out (KES)",
+                    color = NewOrange,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Serif) },
+                shape = RoundedCornerShape(16.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = drinks,
+                onValueChange = { drinks = it },
+                label = { Text("Drinks (KES)",
+                    color = NewOrange,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Serif) },
+                shape = RoundedCornerShape(16.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
 
             Spacer(modifier = Modifier.height(16.dp))
 

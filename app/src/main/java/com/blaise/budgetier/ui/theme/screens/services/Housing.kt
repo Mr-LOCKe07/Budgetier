@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -49,12 +50,11 @@ fun Housing_Screen(navController: NavHostController) {
     var savedLimit by remember { mutableStateOf("") }
 
     var rent by remember { mutableStateOf("") }
-    var waterbill by remember { mutableStateOf("") }
-    var electricitybill by remember { mutableStateOf("") }
-    var securitybill by remember { mutableStateOf("")}
-    var insurance by remember { mutableStateOf("")}
+    var property_taxes by remember { mutableStateOf("") }
+    var maintenance by remember { mutableStateOf("") }
+    var hoa_fees by remember { mutableStateOf("")}
 
-    val totalSpent = listOf(rent, waterbill, electricitybill, securitybill, insurance)
+    val totalSpent = listOf(rent, property_taxes, maintenance, hoa_fees)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
 
@@ -129,7 +129,9 @@ fun Housing_Screen(navController: NavHostController) {
                     onClick = {
                         savedLimit = budgetLimit
                         isEditing = false
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(Color.Transparent),
+                    border = BorderStroke(2.dp, MoneyGreen)
                 ) {
                     Text("Save Limit")
                 }
@@ -154,9 +156,9 @@ fun Housing_Screen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = waterbill,
-                onValueChange = { waterbill = it },
-                label = { Text("Water Bill(KES)",
+                value = property_taxes,
+                onValueChange = { property_taxes = it },
+                label = { Text("Property Taxes(KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
                     fontFamily = FontFamily.Serif) },
@@ -168,23 +170,9 @@ fun Housing_Screen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = electricitybill,
-                onValueChange = { electricitybill = it },
-                label = { Text("Electricity Bill (KES)",
-                    color = NewOrange,
-                    fontSize = 20.sp,
-                    fontFamily = FontFamily.Serif) },
-                shape = RoundedCornerShape(16.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            OutlinedTextField(
-                value = insurance,
-                onValueChange = { insurance = it },
-                label = { Text("Insurance (KES)",
+                value = maintenance,
+                onValueChange = { maintenance = it },
+                label = { Text("Maintenance (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
                     fontFamily = FontFamily.Serif
@@ -193,6 +181,22 @@ fun Housing_Screen(navController: NavHostController) {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = hoa_fees,
+                onValueChange = { hoa_fees = it },
+                label = { Text("HOA Fees (KES)",
+                    color = NewOrange,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Serif
+                ) },
+                shape = RoundedCornerShape(16.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
 
             Spacer(modifier = Modifier.height(16.dp))
 

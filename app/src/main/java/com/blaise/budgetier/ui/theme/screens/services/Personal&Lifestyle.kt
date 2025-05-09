@@ -48,11 +48,13 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
     var budgetLimit by remember { mutableStateOf("") }
     var savedLimit by remember { mutableStateOf("") }
 
-    var netflix by remember { mutableStateOf("") }
-    var spotify by remember { mutableStateOf("") }
-    var wifi by remember { mutableStateOf("") }
+    var clothing by remember { mutableStateOf("") }
+    var gym_memberships by remember { mutableStateOf("") }
+    var subscriptions by remember { mutableStateOf("") }
+    var hobbies by remember { mutableStateOf("") }
+    var personal_care by remember { mutableStateOf("") }
 
-    val totalSpent = listOf(netflix, spotify, wifi)
+    val totalSpent = listOf(clothing, gym_memberships, subscriptions, hobbies, personal_care)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
 
@@ -127,7 +129,9 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
                     onClick = {
                         savedLimit = budgetLimit
                         isEditing = false
-                    }
+                    },
+                    colors = ButtonDefaults.buttonColors(Color.Transparent),
+                    border = BorderStroke(2.dp, MoneyGreen)
                 ) {
                     Text("Save Limit")
                 }
@@ -138,9 +142,9 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(12.dp))
 
             OutlinedTextField(
-                value = netflix,
-                onValueChange = { netflix = it },
-                label = { Text("Netflix (KES)",
+                value = clothing,
+                onValueChange = { clothing = it },
+                label = { Text("Clothing (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
                     fontFamily = FontFamily.Serif) },
@@ -152,9 +156,9 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = spotify,
-                onValueChange = { spotify = it },
-                label = { Text("Water Bill(KES)",
+                value = gym_memberships,
+                onValueChange = { gym_memberships = it },
+                label = { Text("Gym Memberships (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
                     fontFamily = FontFamily.Serif) },
@@ -166,9 +170,9 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(8.dp))
 
             OutlinedTextField(
-                value = wifi,
-                onValueChange = { wifi = it },
-                label = { Text("WI-FI (KES)",
+                value = subscriptions,
+                onValueChange = { subscriptions = it },
+                label = { Text("Subscriptions (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
                     fontFamily = FontFamily.Serif) },
@@ -176,6 +180,35 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth()
             )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = hobbies,
+                onValueChange = { hobbies = it },
+                label = { Text("Hobbies (KES)",
+                    color = NewOrange,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Serif) },
+                shape = RoundedCornerShape(16.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = personal_care,
+                onValueChange = { personal_care = it },
+                label = { Text("Personal Care (KES)",
+                    color = NewOrange,
+                    fontSize = 20.sp,
+                    fontFamily = FontFamily.Serif) },
+                shape = RoundedCornerShape(16.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth()
+            )
+
 
             Spacer(modifier = Modifier.height(16.dp))
 
