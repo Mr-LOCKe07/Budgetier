@@ -1,5 +1,6 @@
 package com.blaise.budgetier.ui.theme.screens.services
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -14,7 +15,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -22,6 +22,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,21 +30,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.blaise.budgetier.model.SharedServiceViewModel
 import com.blaise.budgetier.navigation.BudgetNavigationDrawer
 import com.blaise.budgetier.ui.theme.MoneyGreen
 import com.blaise.budgetier.ui.theme.NewOrange
 import com.blaise.budgetier.ui.theme.YellowElegance
 
 @Composable
-fun Housing_Screen(navController: NavHostController) {
+fun Housing_Screen(
+    navController: NavHostController,
+    viewModel: SharedServiceViewModel = viewModel()
+) {
     var expanded by remember { mutableStateOf(false) }
     var isEditing by remember { mutableStateOf(false) }
     var budgetLimit by remember { mutableStateOf("") }
@@ -57,6 +65,24 @@ fun Housing_Screen(navController: NavHostController) {
     val totalSpent = listOf(rent, property_taxes, maintenance, hoa_fees)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
+    val context = LocalContext.current
+    val sharedPref = context.getSharedPreferences("housing_data", Context.MODE_PRIVATE)
+    val countdownText = viewModel.countdownText
+    LaunchedEffect(Unit) {
+        viewModel.startCountdown(context, "housing_last_input")
+    }
+
+    LaunchedEffect(Unit) {
+        savedLimit = sharedPref.getString("budget_limit", "") ?: ""
+        rent = sharedPref.getString("rent", "") ?: ""
+        property_taxes = sharedPref.getString("property", "") ?: ""
+        maintenance = sharedPref.getString("maintenance", "") ?: ""
+        hoa_fees = sharedPref.getString("hoa_fees", "") ?: ""
+    }
+
+    LaunchedEffect(totalSpent) {
+        viewModel.updateServiceBudget("Housing", totalSpent)
+    }
 
     Scaffold (
         bottomBar = { BudgetNavigationDrawer(navController) }
@@ -107,6 +133,10 @@ fun Housing_Screen(navController: NavHostController) {
                         onClick = {
                             savedLimit = ""
                             isEditing = false
+                            sharedPref.edit() {
+                                remove("budget_limit")
+                                apply()
+                            }
                             expanded = false
                         }
                     )
@@ -119,7 +149,9 @@ fun Housing_Screen(navController: NavHostController) {
                 OutlinedTextField(
                     value = budgetLimit,
                     onValueChange = { budgetLimit = it },
-                    label = { Text("Enter Budget Limit (KES)") },
+                    label = { Text("Enter Budget Limit (KES)",
+                        color = MoneyGreen) },
+                    shape = RoundedCornerShape(16.dp),
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -129,6 +161,10 @@ fun Housing_Screen(navController: NavHostController) {
                     onClick = {
                         savedLimit = budgetLimit
                         isEditing = false
+                        sharedPref.edit() {
+                            putString("budget_limit", budgetLimit)
+                            apply()
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(Color.Transparent),
                     border = BorderStroke(2.dp, MoneyGreen)
@@ -143,7 +179,14 @@ fun Housing_Screen(navController: NavHostController) {
 
             OutlinedTextField(
                 value = rent,
-                onValueChange = { rent = it },
+                onValueChange = {
+                    rent = it
+                    sharedPref.edit(){
+                        putString("rent", it)
+                        apply()
+                    }
+                    viewModel.saveInputTime(context, "housing_last_input")
+                },
                 label = { Text("Rent (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
@@ -157,7 +200,14 @@ fun Housing_Screen(navController: NavHostController) {
 
             OutlinedTextField(
                 value = property_taxes,
-                onValueChange = { property_taxes = it },
+                onValueChange = {
+                    property_taxes = it
+                    sharedPref.edit(){
+                        putString("property_taxes", it)
+                        apply()
+                    }
+                    viewModel.saveInputTime(context, "housing_last_input")
+                },
                 label = { Text("Property Taxes(KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
@@ -171,7 +221,14 @@ fun Housing_Screen(navController: NavHostController) {
 
             OutlinedTextField(
                 value = maintenance,
-                onValueChange = { maintenance = it },
+                onValueChange = {
+                    maintenance = it
+                    sharedPref.edit() {
+                        putString("maintenance", it)
+                        apply()
+                    }
+                    viewModel.saveInputTime(context, "housing_last_input")
+                },
                 label = { Text("Maintenance (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
@@ -186,7 +243,14 @@ fun Housing_Screen(navController: NavHostController) {
 
             OutlinedTextField(
                 value = hoa_fees,
-                onValueChange = { hoa_fees = it },
+                onValueChange = {
+                    hoa_fees = it
+                    sharedPref.edit() {
+                        putString("hoa_fees", it)
+                        apply()
+                    }
+                    viewModel.saveInputTime(context, "housing_last_input")
+                },
                 label = { Text("HOA Fees (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
@@ -201,6 +265,7 @@ fun Housing_Screen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text("Total Spent: KES $totalSpent", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(countdownText.value, fontSize = 16.sp, color = Color.DarkGray)
 
             if (savedLimit.isNotEmpty()) {
                 val limitValue = savedLimit.toDoubleOrNull()

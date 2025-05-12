@@ -1,5 +1,6 @@
 package com.blaise.budgetier.ui.theme.screens.services
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -21,6 +22,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,21 +30,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.blaise.budgetier.model.SharedServiceViewModel
 import com.blaise.budgetier.navigation.BudgetNavigationDrawer
 import com.blaise.budgetier.ui.theme.MoneyGreen
 import com.blaise.budgetier.ui.theme.NewOrange
 import com.blaise.budgetier.ui.theme.YellowElegance
 
 @Composable
-fun Personal_Lifestyle_Screen(navController: NavHostController) {
+fun Personal_Lifestyle_Screen(
+    navController: NavHostController,
+    viewModel: SharedServiceViewModel = viewModel()
+) {
     var expanded by remember { mutableStateOf(false) }
     var isEditing by remember { mutableStateOf(false) }
     var budgetLimit by remember { mutableStateOf("") }
@@ -57,6 +66,26 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
     val totalSpent = listOf(clothing, gym_memberships, subscriptions, hobbies, personal_care)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
+    val context = LocalContext.current
+    val sharedPref = context.getSharedPreferences("housing_data", Context.MODE_PRIVATE)
+    val countdownText = viewModel.countdownText
+    LaunchedEffect(Unit) {
+        viewModel.startCountdown(context, "transportation_last_input")
+    }
+
+
+    LaunchedEffect(Unit) {
+        savedLimit = sharedPref.getString("budget_limit", "") ?: ""
+        clothing = sharedPref.getString("clothing", "") ?: ""
+        gym_memberships = sharedPref.getString("gym_memberships", "") ?: ""
+        subscriptions = sharedPref.getString("subscriptions", "") ?: ""
+        hobbies = sharedPref.getString("hobbies", "") ?: ""
+        personal_care = sharedPref.getString("personal_care", "") ?: ""
+    }
+
+    LaunchedEffect(totalSpent) {
+        viewModel.updateServiceBudget("Personal&Lifestyle", totalSpent)
+    }
 
     Scaffold (
         bottomBar = { BudgetNavigationDrawer(navController) }
@@ -107,6 +136,10 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
                         onClick = {
                             savedLimit = ""
                             isEditing = false
+                            sharedPref.edit() {
+                                remove("budget_limit")
+                                apply()
+                            }
                             expanded = false
                         }
                     )
@@ -119,7 +152,8 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
                 OutlinedTextField(
                     value = budgetLimit,
                     onValueChange = { budgetLimit = it },
-                    label = { Text("Enter Budget Limit (KES)") },
+                    label = { Text("Enter Budget Limit (KES)",
+                        color = MoneyGreen) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -129,6 +163,10 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
                     onClick = {
                         savedLimit = budgetLimit
                         isEditing = false
+                        sharedPref.edit() {
+                            putString("budget_limit", budgetLimit)
+                            apply()
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(Color.Transparent),
                     border = BorderStroke(2.dp, MoneyGreen)
@@ -143,7 +181,14 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
 
             OutlinedTextField(
                 value = clothing,
-                onValueChange = { clothing = it },
+                onValueChange = {
+                    clothing = it
+                    sharedPref.edit() {
+                        putString("clothing", it)
+                        apply()
+                    }
+                    viewModel.saveInputTime(context, "personal&lifestyle_last_input")
+                },
                 label = { Text("Clothing (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
@@ -157,7 +202,14 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
 
             OutlinedTextField(
                 value = gym_memberships,
-                onValueChange = { gym_memberships = it },
+                onValueChange = {
+                    gym_memberships = it
+                    sharedPref.edit() {
+                        putString("gym_memberships", it)
+                        apply()
+                    }
+                    viewModel.saveInputTime(context, "personal&lifestyle_last_input")
+                },
                 label = { Text("Gym Memberships (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
@@ -171,7 +223,14 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
 
             OutlinedTextField(
                 value = subscriptions,
-                onValueChange = { subscriptions = it },
+                onValueChange = {
+                    subscriptions = it
+                    sharedPref.edit() {
+                        putString("subscriptions", it)
+                        apply()
+                    }
+                    viewModel.saveInputTime(context, "personal&lifestyle_last_input")
+                },
                 label = { Text("Subscriptions (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
@@ -185,7 +244,14 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
 
             OutlinedTextField(
                 value = hobbies,
-                onValueChange = { hobbies = it },
+                onValueChange = {
+                    hobbies = it
+                    sharedPref.edit() {
+                        putString("hobbies", it)
+                        apply()
+                    }
+                    viewModel.saveInputTime(context, "personal&lifestyle_last_input")
+                },
                 label = { Text("Hobbies (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
@@ -199,7 +265,14 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
 
             OutlinedTextField(
                 value = personal_care,
-                onValueChange = { personal_care = it },
+                onValueChange = {
+                    personal_care = it
+                    sharedPref.edit() {
+                        putString("personal_care", it)
+                        apply()
+                    }
+                    viewModel.saveInputTime(context, "personal&lifestyle_last_input")
+                },
                 label = { Text("Personal Care (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
@@ -213,6 +286,7 @@ fun Personal_Lifestyle_Screen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text("Total Spent: KES $totalSpent", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(countdownText.value, fontSize = 16.sp, color = Color.DarkGray)
 
             if (savedLimit.isNotEmpty()) {
                 val limitValue = savedLimit.toDoubleOrNull()

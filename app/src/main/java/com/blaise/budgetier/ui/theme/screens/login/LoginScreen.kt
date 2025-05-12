@@ -1,5 +1,7 @@
 package com.blaise.budgetier.ui.theme.screens.login
 
+import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,6 +32,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -45,9 +48,15 @@ import com.blaise.budgetier.navigation.ROUTE_REGISTER
 import com.blaise.budgetier.ui.theme.MoneyGreen
 import com.blaise.budgetier.ui.theme.NewOrange
 import com.blaise.budgetier.ui.theme.YellowElegance
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 @Composable
 fun Login_Screen(navController: NavHostController) {
+    val auth = FirebaseAuth.getInstance()
+    val database = FirebaseDatabase.getInstance().reference
+    val context = LocalContext.current
+
     var email by remember { mutableStateOf(TextFieldValue("")) }
     var password by remember { mutableStateOf(TextFieldValue("")) }
 
@@ -119,7 +128,26 @@ fun Login_Screen(navController: NavHostController) {
         )
 
         Spacer(modifier = Modifier.height(10.dp))
-        Button(onClick = { navController.navigate(ROUTE_MAIN) },
+        Button(onClick = {
+            auth.signInWithEmailAndPassword(email.text, password.text)
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                    val uid = auth.currentUser?.uid ?: return@addOnCompleteListener
+                    database.child("users").child(uid).get().addOnSuccessListener { snapshot ->
+                        val sharedPref = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
+                        sharedPref.edit().apply {
+                            putString("full_name", snapshot.child("full_name").value.toString())
+                            putString("phone", snapshot.child("phone").value.toString())
+                            putString("email", snapshot.child("email").value.toString())
+                            apply()
+                        }
+                        navController.navigate(ROUTE_MAIN)
+                    }
+                } else {
+                    Toast.makeText(context, "Login failed", Toast.LENGTH_SHORT).show()
+                }
+            }
+        },
             colors = ButtonDefaults.buttonColors(Color.Transparent),
             border = BorderStroke(2.dp, YellowElegance),
             shape = RoundedCornerShape(20.dp),

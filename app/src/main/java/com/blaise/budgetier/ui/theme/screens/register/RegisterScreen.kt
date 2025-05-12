@@ -1,6 +1,7 @@
 package com.blaise.budgetier.ui.theme.screens.register
 
 import android.content.Context
+import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -44,15 +45,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.blaise.budgetier.navigation.ROUTE_HOME
 import com.blaise.budgetier.navigation.ROUTE_LOGIN
+import com.blaise.budgetier.navigation.ROUTE_MAIN
 import com.blaise.budgetier.ui.theme.MoneyGreen
 import com.blaise.budgetier.ui.theme.NewOrange
 import com.blaise.budgetier.ui.theme.YellowElegance
+import com.google.firebase.Firebase
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 @Composable
 fun Register_Screen(navController: NavHostController) {
     val context = LocalContext.current
+    val auth = FirebaseAuth.getInstance()
+    val database = FirebaseDatabase.getInstance().reference
 
     var fullname by remember { mutableStateOf(TextFieldValue("")) }
     var phonenumber by remember { mutableStateOf(TextFieldValue("")) }
@@ -207,15 +213,35 @@ fun Register_Screen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(10.dp))
         Button(onClick = {
-                         val sharedPref = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
-                         sharedPref.edit().apply{
-                             putString("full_name", fullname.text)
-                             putString("phone", phonenumber.text)
-                             putString("email", email.text)
-                             apply()
-                         }
-                             navController.navigate(ROUTE_HOME)
-                         },
+            if (password.text == confirmpassword.text) {
+                auth.createUserWithEmailAndPassword(email.text, password.text)
+                    .addOnCompleteListener { task ->
+                        if (task.isSuccessful) {
+                            val uid = auth.currentUser?.uid ?: return@addOnCompleteListener
+                            val userMap = mapOf(
+                                "full_name" to fullname.text,
+                                "phone_number" to phonenumber.text,
+                                "email" to email.text
+                            )
+
+                            database.child("users").child(uid).setValue(userMap).addOnSuccessListener {
+                                val sharedPref = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
+                                sharedPref.edit().apply {
+                                    putString("full_name", fullname.text)
+                                    putString("phone_number", phonenumber.text)
+                                    putString("email", email.text)
+                                    apply()
+                                }
+                                navController.navigate(ROUTE_MAIN)
+                            }
+                        } else {
+                            Toast.makeText(context, "Registration Failed", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+            } else {
+                Toast.makeText(context, "Passwords do not match", Toast.LENGTH_SHORT).show()
+            }
+        },
             colors = ButtonDefaults.buttonColors(Color.Transparent),
             border = BorderStroke(2.dp, YellowElegance),
             shape = RoundedCornerShape(20.dp),

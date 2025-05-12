@@ -1,5 +1,7 @@
 package com.blaise.budgetier.ui.theme.screens.services
 
+import android.content.Context
+import android.system.Os.remove
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -21,6 +23,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,21 +31,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.blaise.budgetier.model.SharedServiceViewModel
 import com.blaise.budgetier.navigation.BudgetNavigationDrawer
 import com.blaise.budgetier.ui.theme.MoneyGreen
 import com.blaise.budgetier.ui.theme.NewOrange
 import com.blaise.budgetier.ui.theme.YellowElegance
 
 @Composable
-fun Food_Screen(navController: NavHostController) {
+fun Food_Screen(
+    navController: NavHostController,
+    viewModel: SharedServiceViewModel = viewModel()
+) {
     var expanded by remember { mutableStateOf(false) }
     var isEditing by remember { mutableStateOf(false) }
     var budgetLimit by remember { mutableStateOf("") }
@@ -55,6 +65,24 @@ fun Food_Screen(navController: NavHostController) {
     val totalSpent = listOf(groceries, dining_out, drinks)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
+    val context = LocalContext.current
+    val sharedPref = context.getSharedPreferences("food_data", Context.MODE_PRIVATE)
+    val countdownText = viewModel.countdownText
+    LaunchedEffect(Unit) {
+        viewModel.startCountdown(context, "transportation_last_input")
+    }
+
+
+    LaunchedEffect(Unit) {
+        savedLimit = sharedPref.getString("budget_limit", "") ?: ""
+        groceries = sharedPref.getString("groceries", "") ?: ""
+        dining_out = sharedPref.getString("dining_out", "") ?: ""
+        drinks = sharedPref.getString("drinks", "") ?: ""
+    }
+
+    LaunchedEffect(totalSpent) {
+        viewModel.updateServiceBudget("Food", totalSpent)
+    }
 
     Scaffold (
         bottomBar = { BudgetNavigationDrawer(navController) }
@@ -105,6 +133,10 @@ fun Food_Screen(navController: NavHostController) {
                         onClick = {
                             savedLimit = ""
                             isEditing = false
+                            sharedPref.edit() {
+                                remove("budget_limit")
+                                apply()
+                            }
                             expanded = false
                         }
                     )
@@ -117,7 +149,8 @@ fun Food_Screen(navController: NavHostController) {
                 OutlinedTextField(
                     value = budgetLimit,
                     onValueChange = { budgetLimit = it },
-                    label = { Text("Enter Budget Limit (KES)") },
+                    label = { Text("Enter Budget Limit (KES)",
+                        color = MoneyGreen) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -127,6 +160,10 @@ fun Food_Screen(navController: NavHostController) {
                     onClick = {
                         savedLimit = budgetLimit
                         isEditing = false
+                        sharedPref.edit() {
+                            putString("budget_limit", budgetLimit)
+                            apply()
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(Color.Transparent),
                     border = BorderStroke(2.dp, MoneyGreen)
@@ -141,7 +178,14 @@ fun Food_Screen(navController: NavHostController) {
 
             OutlinedTextField(
                 value = groceries,
-                onValueChange = { groceries = it },
+                onValueChange = {
+                    groceries = it
+                    sharedPref.edit() {
+                        putString("groceries", it)
+                        apply()
+                    }
+                    viewModel.saveInputTime(context, "food_last_input")
+                },
                 label = { Text("Groceries (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
@@ -155,7 +199,14 @@ fun Food_Screen(navController: NavHostController) {
 
             OutlinedTextField(
                 value = dining_out,
-                onValueChange = { dining_out = it },
+                onValueChange = {
+                    dining_out = it
+                    sharedPref.edit() {
+                        putString("dining_out", it)
+                        apply()
+                    }
+                    viewModel.saveInputTime(context, "food_last_input")
+                },
                 label = { Text("Dining Out (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
@@ -169,7 +220,14 @@ fun Food_Screen(navController: NavHostController) {
 
             OutlinedTextField(
                 value = drinks,
-                onValueChange = { drinks = it },
+                onValueChange = {
+                    drinks = it
+                    sharedPref.edit() {
+                        putString("drinks", it)
+                        apply()
+                    }
+                    viewModel.saveInputTime(context, "food_last_input")
+                },
                 label = { Text("Drinks (KES)",
                     color = NewOrange,
                     fontSize = 20.sp,
@@ -183,6 +241,7 @@ fun Food_Screen(navController: NavHostController) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text("Total Spent: KES $totalSpent", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+            Text(countdownText.value, fontSize = 16.sp, color = Color.DarkGray)
 
             if (savedLimit.isNotEmpty()) {
                 val limitValue = savedLimit.toDoubleOrNull()

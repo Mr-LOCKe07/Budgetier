@@ -18,17 +18,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CreditCard
-import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.MedicalServices
-import androidx.compose.material.icons.filled.MiscellaneousServices
-import androidx.compose.material.icons.filled.Money
-import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Savings
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.TipsAndUpdates
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,16 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.blaise.budgetier.navigation.ROUTE_DEBTPAYMENTS
-import com.blaise.budgetier.navigation.ROUTE_FOOD
-import com.blaise.budgetier.navigation.ROUTE_HEALTHCARE
-import com.blaise.budgetier.navigation.ROUTE_HOUSING
-import com.blaise.budgetier.navigation.ROUTE_INSURANCE
-import com.blaise.budgetier.navigation.ROUTE_MISCELLANEOUS
-import com.blaise.budgetier.navigation.ROUTE_PERSONAL_LIFESTYLE
-import com.blaise.budgetier.navigation.ROUTE_SAVINGS_INVESTMENTS
-import com.blaise.budgetier.navigation.ROUTE_TRANSPORTATION
-import com.blaise.budgetier.navigation.ROUTE_UTILITIES
 import com.blaise.budgetier.ui.theme.MoneyGreen
 import com.blaise.budgetier.ui.theme.NewOrange
 import com.blaise.budgetier.ui.theme.YellowElegance
@@ -65,8 +45,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.blaise.budgetier.model.SharedServiceViewModel
 
 data class ServiceItem(
     val name: String,
@@ -79,36 +63,20 @@ data class ServiceItem(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun Main_Screen(navController: NavController) {
+fun Main_Screen(
+    navController: NavController,
+    viewModel: SharedServiceViewModel = viewModel()
+) {
 
     val context = LocalContext.current
     val sharedPref = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
-    val name = sharedPref.getString("full_name", "User")
-    val email = sharedPref.getString("email", "No email")
+    val name = sharedPref.getString("full_name", "N/A")
+    val email = sharedPref.getString("email", "N/A")
+    val phone = sharedPref.getString("phone", "N/A")
 
-    var services by remember {
-        mutableStateOf(
-            listOf(
-                ServiceItem("Housing", Icons.Filled.Home, ROUTE_HOUSING),
-                ServiceItem("Transportation", Icons.Filled.DirectionsCar, ROUTE_TRANSPORTATION),
-                ServiceItem("Food", Icons.Filled.ShoppingCart, ROUTE_FOOD),
-                ServiceItem("Utilities", Icons.Filled.TipsAndUpdates, ROUTE_UTILITIES),
-                ServiceItem("Insurance", Icons.Filled.Money, ROUTE_INSURANCE),
-                ServiceItem("Healthcare", Icons.Filled.MedicalServices, ROUTE_HEALTHCARE),
-                ServiceItem("Personal&Lifestyle", Icons.Filled.CreditCard, ROUTE_PERSONAL_LIFESTYLE),
-                ServiceItem("DebtPayments", Icons.Filled.Payments, ROUTE_DEBTPAYMENTS),
-                ServiceItem("Savings&Investments", Icons.Filled.Savings, ROUTE_SAVINGS_INVESTMENTS),
-                ServiceItem("Miscellaneous", Icons.Filled.MiscellaneousServices, ROUTE_MISCELLANEOUS)
-            )
-        )
-    }
-
-    val totalBudget = remember(services) {
-        services.filter { it.isActive }.sumOf { it.budget }
-    }
-    val activeCount = remember(services) {
-        services.count { it.isActive}
-    }
+    val services = viewModel.services
+    val totalBudget = services.filter { it.isActive }.sumOf { it.budget }
+    val activeCount = services.count { it.isActive }
 
     Column (
         modifier = Modifier
@@ -154,6 +122,11 @@ fun Main_Screen(navController: NavController) {
                                 email ?: "No email",
                                 fontSize = 16.sp,
                                 color = Color.White.copy(alpha = 0.9f)
+                            )
+                            Text(
+                                phone ?: "No phone",
+                                fontSize = 16.sp,
+                                color = Color.White
                             )
                         }
                     }
@@ -218,19 +191,25 @@ fun Main_Screen(navController: NavController) {
                     service = service,
                     onClick = { navController.navigate(service.route) },
                     onBudgetChange = { updatedService ->
-                        services = services.map {
-                            if (it.name == updatedService.name) {
-                                updatedService
-                            } else {
-                                it
-                            }
-                        }
+                        viewModel.updateServiceBudget(updatedService.name, updatedService.budget)
                     }
                 )
             }
 
-            item{
-                Spacer(modifier = Modifier.height(80.dp))
+            item{ Spacer(modifier = Modifier.height(80.dp)) }
+
+            if (totalBudget > 0) {
+                item {
+                    Button (
+                        onClick = { navController.navigate("payment/${totalBudget}") },
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(MoneyGreen)
+                    ) {
+                        Text("Pay Total Budget (KES ${"%.2f".format(totalBudget)})")
+                    }
+                }
             }
         }
     }

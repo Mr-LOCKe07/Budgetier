@@ -67,20 +67,7 @@ fun Home_Screen(navController: NavHostController) {
             colors = ButtonDefaults.buttonColors(Color.Transparent),
             modifier = Modifier.width(300.dp)
         ) {
-            Text(text = "Login",
-                color = Color.Black,
-                fontSize = 30.sp,
-                fontFamily = FontFamily.Serif)
-        }
-
-        Spacer(modifier = Modifier.height(20.dp))
-        Button(onClick = { navController.navigate(ROUTE_REGISTER)},
-            border = BorderStroke(2.dp, YellowElegance),
-            shape = RoundedCornerShape(16.dp),
-            colors = ButtonDefaults.buttonColors(Color.Transparent),
-            modifier = Modifier.width(300.dp)
-        ) {
-            Text(text = "Register",
+            Text(text = "Get Started",
                 color = Color.Black,
                 fontSize = 30.sp,
                 fontFamily = FontFamily.Serif)
