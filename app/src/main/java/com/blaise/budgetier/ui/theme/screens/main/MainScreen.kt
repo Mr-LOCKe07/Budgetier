@@ -72,7 +72,7 @@ fun Main_Screen(
     val sharedPref = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
     val name = sharedPref.getString("full_name", "N/A")
     val email = sharedPref.getString("email", "N/A")
-    val phone = sharedPref.getString("phone", "N/A")
+    val phone = sharedPref.getString("phone_number", "N/A")
 
     val services = viewModel.services
     val totalBudget = services.filter { it.isActive }.sumOf { it.budget }

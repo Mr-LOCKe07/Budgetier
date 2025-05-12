@@ -87,8 +87,7 @@ fun Login_Screen(navController: NavHostController) {
                     tint = YellowElegance
                 )
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
             label = {
                 Text(
                     text = "Email",
@@ -114,7 +113,8 @@ fun Login_Screen(navController: NavHostController) {
                     tint = YellowElegance
                 )
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            visualTransformation = PasswordVisualTransformation(),
             label = {
                 Text(
                     text = "Password",
@@ -144,7 +144,7 @@ fun Login_Screen(navController: NavHostController) {
                         val sharedPref = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
                         sharedPref.edit().apply {
                             putString("full_name", snapshot.child("full_name").value.toString())
-                            putString("phone", snapshot.child("phone").value.toString())
+                            putString("phone_number", snapshot.child("phone_number").value.toString())
                             putString("email", snapshot.child("email").value.toString())
                             apply()
                         }
