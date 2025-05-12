@@ -3,14 +3,54 @@ package com.blaise.budgetier.model
 import androidx.compose.runtime.*
 import android.content.Context
 import android.os.CountDownTimer
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowCircleLeft
+import androidx.compose.material.icons.filled.Commute
+import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.MedicalServices
+import androidx.compose.material.icons.filled.MiscellaneousServices
+import androidx.compose.material.icons.filled.Money
+import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Savings
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.TipsAndUpdates
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import com.blaise.budgetier.ui.theme.screens.main.ServiceItem
 import androidx.core.content.edit
+import com.blaise.budgetier.navigation.BottomNavItem
+import com.blaise.budgetier.navigation.ROUTE_DEBTPAYMENTS
+import com.blaise.budgetier.navigation.ROUTE_FOOD
+import com.blaise.budgetier.navigation.ROUTE_HEALTHCARE
+import com.blaise.budgetier.navigation.ROUTE_HOUSING
+import com.blaise.budgetier.navigation.ROUTE_INSURANCE
+import com.blaise.budgetier.navigation.ROUTE_MAIN
+import com.blaise.budgetier.navigation.ROUTE_MISCELLANEOUS
+import com.blaise.budgetier.navigation.ROUTE_PERSONAL_LIFESTYLE
+import com.blaise.budgetier.navigation.ROUTE_SAVINGS_INVESTMENTS
+import com.blaise.budgetier.navigation.ROUTE_TRANSPORTATION
+import com.blaise.budgetier.navigation.ROUTE_UTILITIES
 
 class SharedServiceViewModel : ViewModel() {
-    private val _services = mutableStateListOf<ServiceItem>()
+
+    private val _services = mutableStateListOf<ServiceItem>().apply {
+        addAll(
+            listOf(
+                ServiceItem("Housing", Icons.Filled.Home, ROUTE_HOUSING),
+                ServiceItem("Transport", Icons.Filled.Commute, ROUTE_TRANSPORTATION),
+                ServiceItem("Food", Icons.Filled.ShoppingCart, ROUTE_FOOD),
+                ServiceItem("Utilities", Icons.Filled.TipsAndUpdates, ROUTE_UTILITIES),
+                ServiceItem("Insurance", Icons.Filled.Money, ROUTE_INSURANCE),
+                ServiceItem("Healthcare", Icons.Filled.MedicalServices, ROUTE_HEALTHCARE),
+                ServiceItem("Personal&Lifestyle", Icons.Filled.CreditCard, ROUTE_PERSONAL_LIFESTYLE),
+                ServiceItem("DebtPayments", Icons.Filled.Payments, ROUTE_DEBTPAYMENTS),
+                ServiceItem("Savings&Investments", Icons.Filled.Savings, ROUTE_SAVINGS_INVESTMENTS),
+                ServiceItem("Miscellaneous", Icons.Filled.MiscellaneousServices, ROUTE_MISCELLANEOUS)
+            )
+        )
+    }
     val services: List<ServiceItem> = _services
 
     private val _countdownText = mutableStateOf("Loading countdown...")

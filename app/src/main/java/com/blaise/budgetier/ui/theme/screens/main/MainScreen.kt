@@ -48,6 +48,7 @@ import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blaise.budgetier.model.SharedServiceViewModel
@@ -77,6 +78,16 @@ fun Main_Screen(
     val services = viewModel.services
     val totalBudget = services.filter { it.isActive }.sumOf { it.budget }
     val activeCount = services.count { it.isActive }
+
+    LaunchedEffect(Unit) {
+        viewModel.startCountdown(context, "budget_input_time")
+    }
+    Text(
+        viewModel.countdownText.value,
+        modifier = Modifier.padding(start = 16.dp, top = 8.dp),
+        style = MaterialTheme.typography.bodyMedium,
+        color = Color.Gray
+    )
 
     Column (
         modifier = Modifier
