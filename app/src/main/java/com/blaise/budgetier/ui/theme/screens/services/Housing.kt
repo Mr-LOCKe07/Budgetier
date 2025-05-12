@@ -65,6 +65,7 @@ fun Housing_Screen(
     val totalSpent = listOf(rent, property_taxes, maintenance, hoa_fees)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
+    viewModel.updateBudget("Housing", totalSpent)
     val context = LocalContext.current
     val sharedPref = context.getSharedPreferences("housing_data", Context.MODE_PRIVATE)
     val countdownText = viewModel.countdownText

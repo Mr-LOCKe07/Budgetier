@@ -65,6 +65,7 @@ fun Food_Screen(
     val totalSpent = listOf(groceries, dining_out, drinks)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
+    viewModel.updateBudget("Food", totalSpent)
     val context = LocalContext.current
     val sharedPref = context.getSharedPreferences("food_data", Context.MODE_PRIVATE)
     val countdownText = viewModel.countdownText

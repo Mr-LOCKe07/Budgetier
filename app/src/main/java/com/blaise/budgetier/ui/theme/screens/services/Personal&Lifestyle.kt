@@ -66,6 +66,7 @@ fun Personal_Lifestyle_Screen(
     val totalSpent = listOf(clothing, gym_memberships, subscriptions, hobbies, personal_care)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
+    viewModel.updateBudget("Personal&Lifestyle", totalSpent)
     val context = LocalContext.current
     val sharedPref = context.getSharedPreferences("housing_data", Context.MODE_PRIVATE)
     val countdownText = viewModel.countdownText

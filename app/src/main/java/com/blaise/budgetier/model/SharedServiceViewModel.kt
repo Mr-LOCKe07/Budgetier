@@ -26,7 +26,6 @@ import com.blaise.budgetier.navigation.ROUTE_FOOD
 import com.blaise.budgetier.navigation.ROUTE_HEALTHCARE
 import com.blaise.budgetier.navigation.ROUTE_HOUSING
 import com.blaise.budgetier.navigation.ROUTE_INSURANCE
-import com.blaise.budgetier.navigation.ROUTE_MAIN
 import com.blaise.budgetier.navigation.ROUTE_MISCELLANEOUS
 import com.blaise.budgetier.navigation.ROUTE_PERSONAL_LIFESTYLE
 import com.blaise.budgetier.navigation.ROUTE_SAVINGS_INVESTMENTS
@@ -94,5 +93,20 @@ class SharedServiceViewModel : ViewModel() {
             putLong(key, System.currentTimeMillis())
             apply()
         }
+    }
+
+    private val _serviceBudgets = mutableStateMapOf<String, Double>()
+    val serviceBudgets: Map<String, Double> = _serviceBudgets
+
+    fun updateBudget(serviceName: String, amount: Double) {
+        _serviceBudgets[serviceName] = amount
+    }
+
+    fun getTotalBudget(): Double {
+        return _serviceBudgets.values.sum()
+    }
+
+    fun getActiveServiceCount(): Int {
+        return _serviceBudgets.values.count { it > 0.0 }
     }
 }

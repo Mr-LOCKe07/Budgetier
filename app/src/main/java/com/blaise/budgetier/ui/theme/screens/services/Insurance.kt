@@ -65,6 +65,7 @@ fun Insurance_Screen(
     val totalSpent = listOf(health_insurance, auto_insurance, life_insurance, disability_insurance)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
+    viewModel.updateBudget("Insurance", totalSpent)
     val context = LocalContext.current
     val sharedPref = context.getSharedPreferences("housing_data", Context.MODE_PRIVATE)
     val countdownText = viewModel.countdownText

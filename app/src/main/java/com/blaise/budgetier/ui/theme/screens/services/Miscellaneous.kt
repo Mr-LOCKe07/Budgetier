@@ -64,6 +64,7 @@ fun Miscellaneous_Screen(
     val totalSpent = listOf(gifts, donations, unexpected_expenses)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
+    viewModel.updateBudget("Miscellaneous", totalSpent)
     val context = LocalContext.current
     val sharedPref = context.getSharedPreferences("food_data", Context.MODE_PRIVATE)
     val countdownText = viewModel.countdownText

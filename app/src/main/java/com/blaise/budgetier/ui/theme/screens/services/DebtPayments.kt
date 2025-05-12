@@ -64,6 +64,7 @@ fun DebtPayments_Screen(
     val totalSpent = listOf(credit_card_payments, student_loans, personal_loans)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
+    viewModel.updateBudget("DebtPayments", totalSpent)
     val context = LocalContext.current
     val sharedPref = context.getSharedPreferences("food_data", Context.MODE_PRIVATE)
     val countdownText = viewModel.countdownText

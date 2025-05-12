@@ -66,6 +66,7 @@ fun Healthcare_Screen(
     val totalSpent = listOf(doctor_visits, prescriptions, dental, vision, emergency_medical)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
+    viewModel.updateBudget("Healthcare", totalSpent)
     val context = LocalContext.current
     val sharedPref = context.getSharedPreferences("housing_data", Context.MODE_PRIVATE)
     val countdownText = viewModel.countdownText

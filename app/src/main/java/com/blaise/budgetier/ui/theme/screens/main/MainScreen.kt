@@ -40,15 +40,13 @@ import androidx.navigation.compose.rememberNavController
 import com.blaise.budgetier.ui.theme.MoneyGreen
 import com.blaise.budgetier.ui.theme.NewOrange
 import com.blaise.budgetier.ui.theme.YellowElegance
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.blaise.budgetier.model.SharedServiceViewModel
@@ -71,23 +69,17 @@ fun Main_Screen(
 
     val context = LocalContext.current
     val sharedPref = context.getSharedPreferences("user_profile", Context.MODE_PRIVATE)
-    val name = sharedPref.getString("full_name", "N/A")
-    val email = sharedPref.getString("email", "N/A")
-    val phone = sharedPref.getString("phone_number", "N/A")
+    val name = remember { mutableStateOf(sharedPref.getString("full_name", "N/A"))}
+    val email = remember { mutableStateOf(sharedPref.getString("email", "N/A"))}
+    val phone = remember { mutableStateOf(sharedPref.getString("phone_number", "N/A"))}
 
     val services = viewModel.services
-    val totalBudget = services.filter { it.isActive }.sumOf { it.budget }
-    val activeCount = services.count { it.isActive }
+    val totalBudget = viewModel.getTotalBudget()
+    val activeCount = viewModel.getActiveServiceCount()
 
     LaunchedEffect(Unit) {
         viewModel.startCountdown(context, "budget_input_time")
     }
-    Text(
-        viewModel.countdownText.value,
-        modifier = Modifier.padding(start = 16.dp, top = 8.dp),
-        style = MaterialTheme.typography.bodyMedium,
-        color = Color.Gray
-    )
 
     Column (
         modifier = Modifier
@@ -104,8 +96,7 @@ fun Main_Screen(
         LazyColumn {
             item {
                 Card (
-                    modifier = Modifier
-                        .fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(bottomStart = 30.dp, bottomEnd = 30.dp),
                     colors = CardDefaults.cardColors(NewOrange)
                 ){
@@ -124,18 +115,18 @@ fun Main_Screen(
                         Spacer(modifier = Modifier.width(16.dp))
                         Column {
                             Text(
-                                name ?: "User",
+                                name.value ?: "N/A",
                                 fontSize = 20.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = Color.White
                             )
                             Text(
-                                email ?: "No email",
+                                email.value ?: "N/A",
                                 fontSize = 16.sp,
                                 color = Color.White.copy(alpha = 0.9f)
                             )
                             Text(
-                                phone ?: "No phone",
+                                phone.value ?: "N/A",
                                 fontSize = 16.sp,
                                 color = Color.White
                             )
@@ -143,6 +134,15 @@ fun Main_Screen(
                     }
                 }
                 Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    viewModel.countdownText.value,
+                    modifier = Modifier.padding(start = 16.dp),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = Color.DarkGray
+                )
+
+                Spacer(modifier = Modifier.height(12.dp))
 
                 Card (
                     modifier = Modifier
@@ -162,7 +162,7 @@ fun Main_Screen(
                                 color = MoneyGreen
                             )
                             Text(
-                                "$activeCount active",
+                                "$activeCount active services",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = Color.Gray
                             )
@@ -188,8 +188,26 @@ fun Main_Screen(
             item {
                 if (services.any { !it.isActive }) {
                     Text(
-                        "Available Categories",
+                        "Available Services",
                         modifier = Modifier.padding(start = 24.dp, top = 16.dp, bottom = 8.dp),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MoneyGreen,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
+            items (services.filter { !it.isActive }) { service ->
+                ServiceCard(
+                    service = service,
+                    onClick = { navController.navigate(service.route) }
+                )
+            }
+
+            item {
+                if (services.any { !it.isActive }) {
+                    Text(
+                        "Active Services",
+                        modifier = Modifier.padding(start = 24.dp, top = 24.dp, bottom = 8.dp),
                         style = MaterialTheme.typography.titleLarge,
                         color = MoneyGreen.copy(alpha = 0.7f),
                         fontWeight = FontWeight.Bold
@@ -197,17 +215,7 @@ fun Main_Screen(
                 }
             }
 
-            items (services.filter { !it.isActive }) { service ->
-                ServiceCard(
-                    service = service,
-                    onClick = { navController.navigate(service.route) },
-                    onBudgetChange = { updatedService ->
-                        viewModel.updateServiceBudget(updatedService.name, updatedService.budget)
-                    }
-                )
-            }
-
-            item{ Spacer(modifier = Modifier.height(80.dp)) }
+            item{ Spacer(modifier = Modifier.height(20.dp)) }
 
             if (totalBudget > 0) {
                 item {
@@ -230,12 +238,8 @@ fun Main_Screen(
 fun ServiceCard(
     service: ServiceItem,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    onBudgetChange: (ServiceItem) -> Unit
+    modifier: Modifier = Modifier
 ) {
-    var showBudgetInput by remember { mutableStateOf(false) }
-    var budgetInput by remember { mutableStateOf(service.budget.toString()) }
-
     Card (
         modifier = Modifier
             .fillMaxWidth()
@@ -273,7 +277,7 @@ fun ServiceCard(
             }
             Icon(
                 Icons.Default.ArrowForward,
-                contentDescription = "View details",
+                contentDescription = "Go to service",
                 tint = Color.Gray.copy(alpha = 0.7f)
             )
         }

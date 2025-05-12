@@ -67,6 +67,7 @@ fun Utilities_Screen(
     val totalSpent = listOf(electricity, water, gas, internet, smart_phone, trash_collection)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
+    viewModel.updateBudget("Utilities", totalSpent)
     val context = LocalContext.current
     val sharedPref = context.getSharedPreferences("housing_data", Context.MODE_PRIVATE)
     val countdownText = viewModel.countdownText

@@ -65,6 +65,7 @@ fun Savings_Investments_Screen(
     val totalSpent = listOf(emergency_fund, retirement, investments, big_purchases)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
+    viewModel.updateBudget("Savings&Investments", totalSpent)
     val context = LocalContext.current
     val sharedPref = context.getSharedPreferences("housing_data", Context.MODE_PRIVATE)
     val countdownText = viewModel.countdownText

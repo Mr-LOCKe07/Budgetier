@@ -35,7 +35,7 @@ fun NavGraph(
     modifier: Modifier
 ) {
     val auth = FirebaseAuth.getInstance()
-    val finalStartDestination = if (auth.currentUser != null) ROUTE_MAIN else ROUTE_HOME
+    val finalStartDestination = if (auth.currentUser != null) ROUTE_LOGIN else ROUTE_HOME
     val context = LocalContext.current
 
     NavHost(navController = navController,

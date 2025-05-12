@@ -69,6 +69,7 @@ fun Transportation_Screen(
     val totalSpent = listOf(car_payment, fuel, maintenance, public_transit, ride_sharing, parking)
         .mapNotNull { it.toDoubleOrNull() }
         .sum()
+    viewModel.updateBudget("Transportation", totalSpent)
     val context = LocalContext.current
     val sharedPref = context.getSharedPreferences("transportation_data", Context.MODE_PRIVATE)
     val countdownText = viewModel.countdownText
