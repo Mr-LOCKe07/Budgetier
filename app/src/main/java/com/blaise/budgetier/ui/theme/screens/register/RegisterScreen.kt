@@ -1,6 +1,8 @@
 package com.blaise.budgetier.ui.theme.screens.register
 
+import android.R.attr.text
 import android.content.Context
+import android.util.Patterns
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -39,6 +41,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -170,7 +173,8 @@ fun Register_Screen(navController: NavHostController) {
                     tint = YellowElegance
                 )
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            visualTransformation = PasswordVisualTransformation(),
             label = {
                 Text(
                     text = "Password",
@@ -196,7 +200,8 @@ fun Register_Screen(navController: NavHostController) {
                     tint = YellowElegance
                 )
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            visualTransformation = PasswordVisualTransformation(),
             label = {
                 Text(
                     text = "Confirm Password",
@@ -212,8 +217,26 @@ fun Register_Screen(navController: NavHostController) {
         )
 
         Spacer(modifier = Modifier.height(10.dp))
-        Button(onClick = {
-            if (password.text == confirmpassword.text) {
+        Button(
+            onClick = {
+                if (fullname.text.isBlank() || phonenumber.text.isBlank() || email.text.isBlank()
+                    || password.text.isBlank() || confirmpassword.text.isBlank()
+                    ) {
+                    Toast.makeText(context, "Please fill all fields", Toast.LENGTH_SHORT).show()
+                    return@Button
+                }
+
+                if (!Patterns.EMAIL_ADDRESS.matcher(email.text).matches()) {
+                    Toast.makeText(context, "Invalid email format", Toast.LENGTH_SHORT).show()
+                    return@Button
+                }
+
+                if (password.text.length < 6) {
+                    Toast.makeText(context, "Password should be at least 6 characters", Toast.LENGTH_SHORT).show()
+                    return@Button
+                }
+
+                if (password.text == confirmpassword.text) {
                 auth.createUserWithEmailAndPassword(email.text, password.text)
                     .addOnCompleteListener { task ->
                         if (task.isSuccessful) {

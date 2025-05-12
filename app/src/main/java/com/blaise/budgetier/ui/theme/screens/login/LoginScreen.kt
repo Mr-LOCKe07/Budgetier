@@ -37,6 +37,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -86,7 +87,8 @@ fun Login_Screen(navController: NavHostController) {
                     tint = YellowElegance
                 )
             },
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            visualTransformation = PasswordVisualTransformation(),
             label = {
                 Text(
                     text = "Email",
@@ -129,6 +131,11 @@ fun Login_Screen(navController: NavHostController) {
 
         Spacer(modifier = Modifier.height(10.dp))
         Button(onClick = {
+
+            if (email.text.isBlank() || password.text.isBlank()) {
+                Toast.makeText(context, "Please enter email and password", Toast.LENGTH_SHORT).show()
+                return@Button
+            }
             auth.signInWithEmailAndPassword(email.text, password.text)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
