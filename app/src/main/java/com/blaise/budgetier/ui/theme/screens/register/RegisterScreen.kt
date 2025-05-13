@@ -1,6 +1,5 @@
 package com.blaise.budgetier.ui.theme.screens.register
 
-import android.R.attr.text
 import android.content.Context
 import android.util.Patterns
 import android.widget.Toast
@@ -53,7 +52,6 @@ import com.blaise.budgetier.navigation.ROUTE_MAIN
 import com.blaise.budgetier.ui.theme.MoneyGreen
 import com.blaise.budgetier.ui.theme.NewOrange
 import com.blaise.budgetier.ui.theme.YellowElegance
-import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 
